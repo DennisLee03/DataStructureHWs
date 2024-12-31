@@ -15,23 +15,9 @@ typedef struct {
     int n;
 } Graph;
 Graph *createGraph(int n);
-void bfs(Graph *graph, int v);
-void dfs(Graph *graph, int v);
+void dfs(Graph *graph, int v, bool *visited);
 void freeGraph(Graph *graph);
 void printGraph(Graph *graph);
-
-
-/* --- Queue Data Type --- */
-typedef struct {
-    int *items;
-    int front;
-    int rear;
-} Queue;
-Queue *createQueue(int n);
-void push(Queue *queue, int item);
-int pop(Queue *queue);
-void freeQueue(Queue *queue);
-
 
 /* --- other functions --- */
 int readSize();
@@ -40,6 +26,8 @@ void readData(Graph *graph);
 int main() {
     Graph *graph;
     int n;
+    bool *visited;
+    CALLOC(visited, n, sizeof(bool));
 
     // first input to determine size
     n = readSize();
@@ -54,7 +42,8 @@ int main() {
     // read adjacent matrix data
     readData(graph);
 
-    bfs(graph, 0);
+    // search
+    dfs(graph, 1, visited);
 
     freeGraph(graph);
 
@@ -110,38 +99,17 @@ void readData(Graph *graph) {
     }
 }
 
-void bfs(Graph *graph, int v) {
-    bool *visited;
-    Queue *queue;
-
-    // init queue and visited
-    CALLOC(visited, graph->n, sizeof(bool));
-    queue = createQueue(graph->n);
-
-    // proccess the initial vertex
-    push(queue, v);
+void dfs(Graph *graph, int v, bool *visited) {
+    // beginning point
     visited[v] = true;
     printf("%d ", v+1);
 
-    // bfs
-    while(queue->front != queue->rear) {
-        v = pop(queue);
-        for(int i = 0; i < graph->n; i++) {
-            // if edge exists and i is not visited
-            if(graph->adjMatrix[v][i] && !visited[i]) {
-                push(queue, i);
-                visited[i] = true;
-                printf("%d ", i+1);
-            }
+    //dfs 
+    for(int i = 0; i < graph->n; i++) {
+        if(graph->adjMatrix[v][i] && !visited[i]) {
+            dfs(graph, i, visited);
         }
     }
-
-    free(visited);
-    freeQueue(queue);
-}
-
-void dfs(Graph *graph, int v) {
-    
 }
 
 int readSize() {
@@ -163,28 +131,4 @@ int readSize() {
     }
 
     return n;
-}
-
-Queue *createQueue(int n) {
-    Queue *queue;
-    CALLOC(queue, 1, sizeof(Queue));
-    CALLOC(queue->items, n, sizeof(int));
-    queue->front = -1;
-    queue->rear = -1;
-    return queue;
-}
-
-void push(Queue *queue, int item) {
-    (queue->rear)++;
-    queue->items[queue->rear] = item;
-}
-
-int pop(Queue *queue) {
-    (queue->front)++;
-    return queue->items[queue->front];
-}
-
-void freeQueue(Queue *queue) {
-    free(queue->items);
-    free(queue);
 }
