@@ -3,6 +3,7 @@
 #include<string.h>
 #include <math.h>
 #include<stdbool.h>
+#include<limits.h>
 
 #define MAX_INPUT_LEN 100
 #define MAX_COMMANDS 100
@@ -51,12 +52,15 @@ FibNode *extractMin(FibHeap *heap);
 void removeNode(FibNode *node);
 void joining(FibHeap *heap);
 void link(FibNode *root, FibNode *node);
+void single_cut(FibHeap *heap, FibNode *node, FibNode *parent);
+void cascading_cut(FibHeap *heap, FibNode *node);
 FibNode* searchNode(FibNode *root, int key);
 void decreaseKey(FibHeap *heap, int key, int sub);
 FibNode *delete(FibHeap *heap, int key);
 
-// control
+// control & debug
 void operationPanel(FibHeap *heap);
+void level_order(FibNode *root);
 void printHeap(FibHeap *heap);
 
 int main() {
@@ -444,7 +448,7 @@ void decreaseKey(FibHeap *heap, int key, int sub) {
 
 FibNode *delete(FibHeap *heap, int key) {
     if(heap == NULL || heap->min == NULL) return NULL;
-    decreaseKey(heap, key, key);
+    decreaseKey(heap, key, INT_MAX);
     return extractMin(heap);
 }
 
